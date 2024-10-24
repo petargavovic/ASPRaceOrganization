@@ -1,0 +1,121 @@
+﻿@if (allState.ShowRangListe)
+{
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <button class="btn btn-primary mb-3" @onclick="GetRangListe"></button>
+                        <h4 class="float-start">Rang Liste</h4>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col" class="cursor-pointer" @onclick="() => SortBy(nameof(RangLista.Kategorija.NazivKategorije))">Kategorija</th>
+                                    <th scope="col" class="cursor-pointer" @onclick="() => SortBy(nameof(RangLista.KrajSezone))">Kraj sezone</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (RangListe.Count > 0)
+                                {
+                                    int count = 1;
+                                    foreach (var item in RangListe)
+                                    {
+                                        <tr>
+                                            <th scope="row">@count</th>
+                                            <td>@item.Kategorija.NazivKategorije</td>
+                                            <td>@item.KrajSezone</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3">
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Ordinal</th>
+                                                            <th>Ime Prezime</th>
+                                                            <th>Broj Poena</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var plasman in item.Plasman.OrderByDescending(p => p.BrojPoena).Select((p, index) => new { Plasman = p, Ordinal = index + 1 }))
+                                                        {
+                                                            <tr>
+                                                                <td>@plasman.Ordinal</td>
+                                                                <td>@plasman.Plasman.ImeIPrezime</td>
+                                                                <td>@plasman.Plasman.BrojPoena</td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        count++;
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="3"><div class="alert alert-info text-center">U sistemu nema rang listi!</div></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<style>
+    .cursor-pointer {
+        cursor: pointer;
+    }
+</style>
+
+@code {
+    RangListaDTO RangLista = new();
+    public List<RangListaDTO> RangListe { get; set; } = new();
+    private bool ascending = true;
+    private string sortColumn = "";
+
+    protected override async void OnInitialized()
+    {
+        await GetRangListe();
+        allState.Action += StateHasChanged;
+    }
+
+    private async Task GetRangListe()
+    {
+        RangListe = await ranglistaService.GetAll(Constants.RangListaBaseUrl);
+        SortBy(sortColumn);
+    }
+
+    private void SortBy(string column)
+    {
+        if (sortColumn == column)
+            ascending = !ascending;
+        else
+            ascending = true;
+        sortColumn = column;
+
+        switch (column)
+        {
+            case "NazivKategorije":
+                RangListe = ascending ? RangListe.OrderBy(v => v.Kategorija.NazivKategorije).ToList() : RangListe.OrderByDescending(v => v.Kategorija.NazivKategorije).ToList();
+                break;
+            case "KrajSezone":
+                RangListe = ascending ? RangListe.OrderBy(v => v.KrajSezone).ToList() : RangListe.OrderByDescending(v => v.KrajSezone).ToList();
+                break;
+            default:
+                break;
+        }
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        allState.Action -= StateHasChanged;
+    }
+}

@@ -1,0 +1,80 @@
+﻿@page "/nav"
+@using Client.ApplicationStates
+@using Microsoft.AspNetCore.Components.Authorization
+
+<AuthorizeView>
+    <Authorized>
+        <div class="top-row ps-3 navbar navbar-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="">
+                    Zdravo, @context.User.Identity!.Name
+                </a>
+                <button title="Navigation menu" class="navbar-toggler">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+        </div>
+
+        <div class="nav-scrollable">
+            <nav class="flex-column">
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link p-2" href="/home/dashboard" @onclick="OnWelcome">
+                        <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <a class="nav-link p-2" @onclick="OnVozaci" style="cursor: pointer;">
+                        <div class="hstack gap-1">
+                            <span class="bi bi-person-fill fs-3 text-center" aria-hidden="true" style="margin-top:-2rem"></span>
+                            <span>Vozaci</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="nav-item px-3">
+                    <a class="nav-link p-2" @onclick="OnTrke" style="cursor: pointer;">
+                        <div class="hstack gap-1">
+                            <span class="bi bi-car-front-fill fs-3 text-center" aria-hidden="true" style="margin-top:-2rem"></span>
+                            <span>Trke</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="nav-item px-3">
+                    <a class="nav-link p-2" @onclick="OnRangListe" style="cursor: pointer;">
+                        <div class="hstack gap-1">
+                            <span class="bi bi-bar-chart-fill fs-3 text-center" aria-hidden="true" style="margin-top:-2rem"></span>
+                            <span>Rang Liste</span>
+                        </div>
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </Authorized>
+</AuthorizeView>
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        OnWelcome();
+    }
+
+    private void OnVozaci()
+    {
+        allState.VozaciClicked();
+    }
+
+    private void OnTrke()
+    {
+        allState.TrkeClicked();
+    }
+
+    private void OnRangListe()
+    {
+        allState.RangListeClicked();
+    }
+
+    private void OnWelcome()
+    {
+        allState.WelcomeClicked();
+    }
+}

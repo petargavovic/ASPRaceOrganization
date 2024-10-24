@@ -1,0 +1,63 @@
+﻿
+@if (allState.ShowWelcome)
+{
+    <div class="welcome-container">
+        <div class="welcome-message">
+            <h1>Dobrodošli na Ultimate Racing Tracker</h1>
+            <p>
+                Dobrodošli na našu veb aplikaciju koja je dizajnirana da vam pomogne u organizaciji i praćenju uzbudljivih auto trka!
+                Naša platforma pruža sveobuhvatan set alata za upravljanje trkama, pregled detaljnih performansi i praćenje rangiranja.
+                Bilo da ste entuzijasta trka ili profesionalni organizator, ovde ćete pronaći sve što vam je potrebno da vaše trke
+                budu uspešne.
+            </p>
+            <p>
+                Istražite funkcionalnosti za praćenje vozača, upravljanje trkama i pregled rang lista na jednom mestu.
+                Naš intuitivni interfejs osigurava da imate besprekorno iskustvo, držeći vas informisanim i u kontrolu
+                svakog aspekta vaših trkačkih događaja.
+            </p>
+        </div>
+
+    </div>
+}
+<style>
+
+    body {
+        background: url('images/background/bgW.jpg') no-repeat center center fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }
+
+    .welcome-container {
+    height: 100vh; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white; 
+    text-align: center;
+    padding: 20px;
+}
+
+.welcome-message {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.welcome-message h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.welcome-message p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+}
+</style>
+@code{
+protected override void OnInitialized()
+    {
+        allState.Action += StateHasChanged;
+    }
+}

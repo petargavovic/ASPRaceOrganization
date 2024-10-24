@@ -1,0 +1,203 @@
+﻿@implements IDisposable
+
+@if (allState.ShowVozaci)
+{
+    <div class="continer mt-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="float-start">Vozaci</h4>
+                        <button class="btn btn-outline-success float-end" @onclick="AddClicked"><i class="bi bi-plus-circle-dotted"></i> Dodaj Vozaca </button>
+                    </div>
+                    <div class="card-header" style="max-height:580px;overflow-x:hidden; overflow-y:scroll;">
+                        <div class="card-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col" class="cursor-pointer" @onclick="() => SortBy(nameof(Vozac.Ime))">Ime</th>
+                                        <th scope="col" class="cursor-pointer" @onclick="() => SortBy(nameof(Vozac.Prezime))">Prezime</th>
+                                        <th scope="col" class="cursor-pointer" @onclick="() => SortBy(nameof(Vozac.Drzava))">Država</th>
+                                        <th scope="col" class="cursor-pointer" @onclick="() => SortBy(nameof(Vozac.DatumRodjenja))">Datum rođenja</th>
+                                        <th scope="col">Radnja</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Vozaci.Count > 0)
+                                    {
+                                        int count = 1;
+                                        foreach (var item in Vozaci)
+                                        {
+                                            <tr>
+                                                <th scope="row">@count</th>
+                                                <td>@item.Ime</td>
+                                                <td>@item.Prezime</td>
+                                                <td>@item.Drzava</td>
+                                                <td>@item.DatumRodjenja.ToString("dd-MM-yyyy")</td>
+                                                <td>
+                                                    <i class="bi bi-pencil text-info" id="cursorStyle"
+                                                       @onclick="()=>EditClicked(item)"></i>
+                                                    <i class="bi bi-trash text-danger" id="cursorStyle"
+                                                       @onclick="()=>DeleteClicked(item)"></i>
+                                                </td>
+                                            </tr>
+                                            count++;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="6"><div class="alert alert-info text-center">U sistemu nema vozača!</div></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<style>
+    .cursor-pointer {
+        cursor: pointer;
+    }
+</style>
+
+<VozaciDialog @ref="vozaciDialog"
+              HandleSaveOperationEvent="HandleSaveOperationEvent"
+              Vozac="Vozac" />
+
+              
+
+@code {
+    VozaciDialog? vozaciDialog;
+    VozacDTO Vozac = new();
+    public string Title { get; set; } = "Dodaj";
+    public List<VozacDTO> Vozaci { get; set; } = new();
+    private bool izmena = false;
+    private bool ascending = true;
+    private string sortColumn = "";
+
+    protected override async void OnInitialized()
+    {
+        await GetVozaci();
+        allState.Action += StateHasChanged;
+        Reset();
+    }
+
+    private async Task GetVozaci()
+    {
+        Vozaci = await vozacService.GetAll(Constants.VozacBaseUrl);
+//        SortBy(sortColumn);
+    }
+
+    void OpenDialog()
+    {
+        vozaciDialog?.OpenDialog();
+    }
+
+    void Reset()
+    {
+        Vozac = new();
+        Vozac.DatumRodjenja = DateTime.Now.AddDays(-1);
+        Vozac.Drzava = "Serbia";
+        vozaciDialog?.ChangeTitle("Dodaj");
+    }
+
+    private void AddClicked()
+    {
+        Reset();
+        OpenDialog();
+    }
+
+    private async Task HandleSaveOperationEvent(VozacDTO vozac)
+    {
+        bool successCheck = false;
+        if (vozac.Id > 0)
+        {
+            var result = await vozacService.Update(vozac, Constants.VozacBaseUrl);
+            successCheck = await DisplayMessage(result.Flag, result.Message);
+        }
+        else
+        {
+            var response = await vozacService.Insert(vozac, Constants.VozacBaseUrl);
+            successCheck = await DisplayMessage(response.Flag, response.Message);
+        }
+
+        if (successCheck)
+        {
+            Reset();
+            await GetVozaci();
+        }
+    }
+
+    private async Task<bool> DisplayMessage(bool flag, string message)
+    {
+        if (!flag)
+        {
+            await dialogService.AlertAsync(message, "Uspešna operacija!");
+            return true;
+        }
+        else
+        {
+            await dialogService.AlertAsync(message, "Greška!");
+            return false;
+        }
+    }
+
+    private void EditClicked(VozacDTO vozac)
+    {
+        vozaciDialog?.ChangeTitle("Izmeni");
+        Vozac = vozac;
+        izmena = true;
+        OpenDialog();
+        izmena = false;
+    }
+
+    private async Task DeleteClicked(VozacDTO vozac)
+    {
+        bool confirm = await dialogService.ConfirmAsync($"Da li ste sigurni da želite da obrišete vozača {vozac.Ime} {vozac.Prezime}?", "Potvrdi brisanje");
+        if (!confirm) return;
+
+        var response = await vozacService.DeleteById(vozac.Id, Constants.VozacBaseUrl);
+        if (await DisplayMessage(response.Flag, response.Message))
+            await GetVozaci();
+    }
+
+    private void SortBy(string column)
+    {
+        if (sortColumn == column)
+            ascending = !ascending;
+        else
+            ascending = true;
+        sortColumn = column;
+
+        switch (column)
+        {
+            case "Ime":
+                Vozaci = ascending ? Vozaci.OrderBy(v => v.Ime).ToList() : Vozaci.OrderByDescending(v => v.Ime).ToList();
+                break;
+            case "Prezime":
+                Vozaci = ascending ? Vozaci.OrderBy(v => v.Prezime).ToList() : Vozaci.OrderByDescending(v => v.Prezime).ToList();
+                break;
+            case "Drzava":
+                Vozaci = ascending ? Vozaci.OrderBy(v => v.Drzava).ToList() : Vozaci.OrderByDescending(v => v.Drzava).ToList();
+                break;
+            case "DatumRodjenja":
+                Vozaci = ascending ? Vozaci.OrderBy(v => v.DatumRodjenja).ToList() : Vozaci.OrderByDescending(v => v.DatumRodjenja).ToList();
+                break;
+            default:
+                break;
+        }
+
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        allState.Action -= StateHasChanged;
+    }
+}

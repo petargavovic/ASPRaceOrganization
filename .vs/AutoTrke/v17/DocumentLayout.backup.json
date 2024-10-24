@@ -1,0 +1,155 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\User\\Desktop\\AutoTrke\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{55A784EC-2037-42C2-A783-EB224B017402}|Client\\Client.csproj|c:\\users\\user\\desktop\\autotrke\\client\\pages\\contentpages\\welcomepage.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{55A784EC-2037-42C2-A783-EB224B017402}|Client\\Client.csproj|solutionrelative:client\\pages\\contentpages\\welcomepage.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{55A784EC-2037-42C2-A783-EB224B017402}|Client\\Client.csproj|c:\\users\\user\\desktop\\autotrke\\client\\pages\\accountpages\\registerpage.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{55A784EC-2037-42C2-A783-EB224B017402}|Client\\Client.csproj|solutionrelative:client\\pages\\accountpages\\registerpage.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{55A784EC-2037-42C2-A783-EB224B017402}|Client\\Client.csproj|c:\\users\\user\\desktop\\autotrke\\client\\pages\\accountpages\\loginpage.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{55A784EC-2037-42C2-A783-EB224B017402}|Client\\Client.csproj|solutionrelative:client\\pages\\accountpages\\loginpage.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{55A784EC-2037-42C2-A783-EB224B017402}|Client\\Client.csproj|c:\\users\\user\\desktop\\autotrke\\client\\pages\\contentpages\\entitypages\\trkedialog.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{55A784EC-2037-42C2-A783-EB224B017402}|Client\\Client.csproj|solutionrelative:client\\pages\\contentpages\\entitypages\\trkedialog.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{55A784EC-2037-42C2-A783-EB224B017402}|Client\\Client.csproj|c:\\users\\user\\desktop\\autotrke\\client\\pages\\contentpages\\entitypages\\vozacidialog.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{55A784EC-2037-42C2-A783-EB224B017402}|Client\\Client.csproj|solutionrelative:client\\pages\\contentpages\\entitypages\\vozacidialog.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{55A784EC-2037-42C2-A783-EB224B017402}|Client\\Client.csproj|c:\\users\\user\\desktop\\autotrke\\client\\pages\\contentpages\\entitypages\\trkepage.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{55A784EC-2037-42C2-A783-EB224B017402}|Client\\Client.csproj|solutionrelative:client\\pages\\contentpages\\entitypages\\trkepage.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{55A784EC-2037-42C2-A783-EB224B017402}|Client\\Client.csproj|c:\\users\\user\\desktop\\autotrke\\client\\pages\\contentpages\\entitypages\\ucinakdialog.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{55A784EC-2037-42C2-A783-EB224B017402}|Client\\Client.csproj|solutionrelative:client\\pages\\contentpages\\entitypages\\ucinakdialog.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 10,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{fbcae063-e2c0-4ab1-a516-996ea3dafb72}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "RegisterPage.razor",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\AutoTrke\\Client\\Pages\\AccountPages\\RegisterPage.razor",
+              "RelativeDocumentMoniker": "Client\\Pages\\AccountPages\\RegisterPage.razor",
+              "ToolTip": "C:\\Users\\User\\Desktop\\AutoTrke\\Client\\Pages\\AccountPages\\RegisterPage.razor",
+              "RelativeToolTip": "Client\\Pages\\AccountPages\\RegisterPage.razor",
+              "ViewState": "AgIAACcAAAAAAAAAAAAAAEUAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-09-19T11:53:32.467Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "LoginPage.razor",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\AutoTrke\\Client\\Pages\\AccountPages\\LoginPage.razor",
+              "RelativeDocumentMoniker": "Client\\Pages\\AccountPages\\LoginPage.razor",
+              "ToolTip": "C:\\Users\\User\\Desktop\\AutoTrke\\Client\\Pages\\AccountPages\\LoginPage.razor",
+              "RelativeToolTip": "Client\\Pages\\AccountPages\\LoginPage.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-09-19T11:53:28.891Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "TrkeDialog.razor",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\AutoTrke\\Client\\Pages\\ContentPages\\EntityPages\\TrkeDialog.razor",
+              "RelativeDocumentMoniker": "Client\\Pages\\ContentPages\\EntityPages\\TrkeDialog.razor",
+              "ToolTip": "C:\\Users\\User\\Desktop\\AutoTrke\\Client\\Pages\\ContentPages\\EntityPages\\TrkeDialog.razor",
+              "RelativeToolTip": "Client\\Pages\\ContentPages\\EntityPages\\TrkeDialog.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-09-19T11:53:24.851Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "VozaciDialog.razor",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\AutoTrke\\Client\\Pages\\ContentPages\\EntityPages\\VozaciDialog.razor",
+              "RelativeDocumentMoniker": "Client\\Pages\\ContentPages\\EntityPages\\VozaciDialog.razor",
+              "ToolTip": "C:\\Users\\User\\Desktop\\AutoTrke\\Client\\Pages\\ContentPages\\EntityPages\\VozaciDialog.razor",
+              "RelativeToolTip": "Client\\Pages\\ContentPages\\EntityPages\\VozaciDialog.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-09-19T11:53:23.683Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "TrkePage.razor",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\AutoTrke\\Client\\Pages\\ContentPages\\EntityPages\\TrkePage.razor",
+              "RelativeDocumentMoniker": "Client\\Pages\\ContentPages\\EntityPages\\TrkePage.razor",
+              "ToolTip": "C:\\Users\\User\\Desktop\\AutoTrke\\Client\\Pages\\ContentPages\\EntityPages\\TrkePage.razor",
+              "RelativeToolTip": "Client\\Pages\\ContentPages\\EntityPages\\TrkePage.razor",
+              "ViewState": "AgIAALIBAAAAAAAAAAAAAMYBAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-09-19T11:47:00.302Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "UcinakDialog.razor",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\AutoTrke\\Client\\Pages\\ContentPages\\EntityPages\\UcinakDialog.razor",
+              "RelativeDocumentMoniker": "Client\\Pages\\ContentPages\\EntityPages\\UcinakDialog.razor",
+              "ToolTip": "C:\\Users\\User\\Desktop\\AutoTrke\\Client\\Pages\\ContentPages\\EntityPages\\UcinakDialog.razor",
+              "RelativeToolTip": "Client\\Pages\\ContentPages\\EntityPages\\UcinakDialog.razor",
+              "ViewState": "AgIAAPUAAAAAAAAAAAAAAAsBAABQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-09-19T11:46:06.359Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "WelcomePage.razor",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\AutoTrke\\Client\\Pages\\ContentPages\\WelcomePage.razor",
+              "RelativeDocumentMoniker": "Client\\Pages\\ContentPages\\WelcomePage.razor",
+              "ToolTip": "C:\\Users\\User\\Desktop\\AutoTrke\\Client\\Pages\\ContentPages\\WelcomePage.razor",
+              "RelativeToolTip": "Client\\Pages\\ContentPages\\WelcomePage.razor",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAABYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-09-19T11:38:35.472Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

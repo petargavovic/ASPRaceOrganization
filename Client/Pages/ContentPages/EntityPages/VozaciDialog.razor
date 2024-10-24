@@ -1,0 +1,79 @@
+﻿@using System.Globalization
+@using CountryData.Standard
+
+<SfDialog Width="350px" IsModal="true" ShowCloseIcon="true" @bind-Visible="IsVisible">
+
+    <DialogEvents OnOpen="OpenDialog"> </DialogEvents>
+    <DialogTemplates>
+        <Header> @Title Vozaca </Header>
+        <Content>
+            <EditForm EditContext="editContext" Enhance OnSubmit="Save">
+                <DataAnnotationsValidator />
+                <div class="card border-success">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">Ime</label>
+                            <InputText @bind-Value="Vozac.Ime" class="form-control" />
+                            <ValidationMessage For="@(() => Vozac.Ime)" />
+
+                            <label class="form-label">Prezime</label>
+                            <InputText @bind-Value="Vozac.Prezime" class="form-control" />
+                            <ValidationMessage For="@(() => Vozac.Prezime)" />
+                            <label class="form-label">Država</label>
+                            <select class="form-control" @bind="Vozac.Drzava">
+                                @foreach (var country in CountryList)
+                                {
+                                    <option value="@country">@country</option>
+                                }
+                            </select>
+                            <label class="form-label">Datum rođenja</label>
+                            <InputDate @bind-Value="Vozac.DatumRodjenja" class="form-control" />
+                            <ValidationMessage For="@(() => Vozac.DatumRodjenja)" />
+                        </div>
+                    </div>
+                </div>
+            </EditForm>
+        </Content>
+    </DialogTemplates>
+
+    <DialogButtons>
+        <DialogButton Content="SAVE" Type="ButtonType.Submit" IsPrimary="true" @onclick="Save" />
+    </DialogButtons>
+
+</SfDialog>
+
+
+@code{
+    [Parameter] public VozacDTO Vozac { get; set; } = new();
+    [Parameter] public EventCallback<VozacDTO> HandleSaveOperationEvent{ get; set; }
+    private bool IsVisible { get; set; } = false;
+    public string Title { get; set; } = "Dodaj";
+    public List<string> CountryList { get; set; } = new List<string>();
+    private EditContext editContext;
+    private bool isFormValid = false;
+
+    protected override void OnInitialized()
+    {
+        CountryList = new CountryHelper().GetCountries();
+    }
+
+    public void OpenDialog()
+    {
+        IsVisible = true;
+        StateHasChanged();
+        editContext = new EditContext(Vozac);
+    }
+
+    async void Save()
+    {
+        if (!editContext.Validate())
+            await dialogService.AlertAsync("Forma nije ispravna.", "Upozorenje");
+        else
+            await HandleSaveOperationEvent.InvokeAsync(Vozac);
+    }
+
+    public void ChangeTitle(string title)
+    {
+        Title = title;
+    }
+}

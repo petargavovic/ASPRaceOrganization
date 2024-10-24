@@ -1,0 +1,36 @@
+﻿@using System.Net.Http
+@using System.Net.Http.Json
+@using BaseLibrary.DTOs.EntityDTOs
+@using BaseLibrary.Entities
+@using Client.ApplicationStates
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.AspNetCore.Components.WebAssembly.Http
+@using Microsoft.JSInterop
+@using Client
+@using Client.Layout
+
+@using BaseLibrary.DTOs
+@using ClientLibrary.Helpers
+@using Microsoft.AspNetCore.Components.Authorization
+@using ClientLibrary.Services.Contracts
+@using Syncfusion.Blazor.Popups
+@using Client.Pages.ContentPages.EntityPages
+@using Client.Pages.OtherPages
+
+@inject NavigationManager NavManager
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IUserAccountService accountService
+
+@inject AllState allState
+
+@inject SfDialogService dialogService
+
+@inject IGenericServiceInterface<VozacDTO> vozacService
+@inject IGenericServiceInterface<TrkaDTO> trkaService
+@inject IGenericServiceInterface<RangListaDTO> ranglistaService
+@inject IGenericServiceInterface<UcinakDTO> ucinakService
+@inject IGenericServiceInterface<PlasmanDTO> plasmanService
+@inject IGenericServiceInterface<Kategorija> kategorijaService

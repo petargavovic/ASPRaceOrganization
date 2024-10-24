@@ -1,0 +1,466 @@
+﻿@using BaseLibrary.DTOs.EntityDTOs
+@using System.Text.Json
+@implements IDisposable
+@inject IJSRuntime js
+
+@if (allState.ShowTrke)
+{
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="float-start">Trke</h4>
+                        <button class="btn btn-outline-success float-end" @onclick="AddClicked"><i class="bi bi-plus-circle-dotted"></i> Dodaj Trku </button>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col" class="cursor-pointer" @onclick="() => SortBy(nameof(Trka.Naziv))">Naziv</th>
+                                    <th scope="col" class="cursor-pointer" @onclick="() => SortBy(nameof(Trka.BrojKrugova))">Broj Krugova</th>
+                                    <th scope="col" class="cursor-pointer" @onclick="() => SortBy(nameof(Trka.DatumTrke))">Datum</th>
+                                    <th scope="col" class="cursor-pointer" @onclick="() => SortBy(nameof(Trka.Kategorija.NazivKategorije))">Kategorija</th>
+                                    <th scope="col">Radnja</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Trke.Count > 0)
+                                {
+                                    int count = 1;
+                                    foreach (var item in Trke)
+                                    {
+                                        <tr @onclick="() => ToggleExpanded(item.Id)">
+                                            <th scope="row">@count</th>
+                                            <td>@item.Naziv</td>
+                                            <td>@item.BrojKrugova</td>
+                                            <td>@item.DatumTrke.ToString("dd-MM-yyyy")</td>
+                                            <td>@item.Kategorija.NazivKategorije</td>
+                                            <td>
+                                                <i class="bi bi-pencil text-info" id="cursorStyle"
+                                                   @onclick="(e) => EditClicked(item)" @onclick:stopPropagation></i>
+                                                <i class="bi bi-trash text-danger" id="cursorStyle"
+                                                   @onclick="(e) => DeleteClicked(item)" @onclick:stopPropagation></i>
+                                            </td>
+                                        </tr>
+                                        <tr id="row-@item.Id" class="@(expandedTrke.Contains(item.Id) ? "visible-row" : "hidden-row")">
+                                            <td colspan="6">
+                                                @if (brojUcinaka < 8)
+                                                {
+                                                    <button class="btn btn-outline-success float-end mb-2" @onclick="() => AddUcinakClicked(item)">
+                                                        <i class="bi bi-plus-circle-dotted"></i> Dodaj Učinak
+                                                    </button>
+                                                }
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="cursor-pointer" @onclick="() => SortByUcinak(item, nameof(UcinakDTO.ImeIPrezime))">Vozac</th>
+                                                            <th class="cursor-pointer" @onclick="() => SortByUcinak(item, nameof(UcinakDTO.StartnaPozicija))">Startna Pozicija</th>
+                                                            <th class="cursor-pointer" @onclick="() => SortByUcinak(item, nameof(UcinakDTO.Plasman))">Plasman</th>
+                                                            <th class="cursor-pointer" @onclick="() => SortByUcinak(item, nameof(UcinakDTO.Vremena))">Vreme</th>
+                                                            <th>Radnja</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @if (item.Ucinak?.Count > 0)
+                                                        {
+                                                            foreach (var ucinak in item.Ucinak)
+                                                            {
+                                                                <tr>
+                                                                    <td>@ucinak.ImeIPrezime</td>
+                                                                    <td>@ucinak.StartnaPozicija</td>
+                                                                    <td>@ucinak.Plasman</td>
+                                                                    <td>@VratiVreme(ucinak.Vremena)</td>
+                                                                    <td>
+                                                                        <i class="bi bi-pencil text-info" id="cursorStyle"
+                                                                           @onclick="(e) => EditUcinakClicked(ucinak)" @onclick:stopPropagation></i>
+                                                                        <i class="bi bi-trash text-danger" id="cursorStyle"
+                                                                           @onclick="(e) => DeleteUcinakClicked(ucinak)" @onclick:stopPropagation></i>
+                                                                    </td>
+                                                                </tr>
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            <tr>
+                                                                <td colspan="5">
+                                                                    <div class="alert alert-info text-center">Ova trka nema rezultata!</div>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        count++;
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="4"><div class="alert alert-info text-center">U sistemu nema trka!</div></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+    <style>
+        .hidden-row {
+            display: none;
+        }
+
+        .visible-row {
+            display: table-row;
+        }
+
+        .float-end {
+            float: right;
+        }
+
+        .mb-2 {
+            margin-bottom: 1rem;
+        }
+    </style>
+
+<TrkeDialog @ref="trkeDialog" 
+            HandleSaveOperationEvent="HandleSaveOperationEvent"
+            Trka="Trka" />
+
+<UcinakDialog @ref="ucinakDialog"
+            HandleSaveOperationEvent="HandleSaveOperationEvent2"
+            Ucinak="Ucinak"
+              Trka="Trka" />
+
+@code {
+    TrkeDialog? trkeDialog;
+    TrkaDTO Trka = new();
+    UcinakDialog? ucinakDialog;
+    UcinakDTO Ucinak = new();
+    public string Title { get; set; } = "Dodaj";
+    public List<TrkaDTO> Trke { get; set; } = new();
+    private bool ascending = true;
+    private string sortColumn = "";
+    private bool ucinakAscending = true;
+    private string ucinakSortColumn = "";
+    private HashSet<int> expandedTrke = new HashSet<int>();
+    int index = 0;
+    int brojUcinaka = 0;
+
+
+    protected override async void OnInitialized()
+    {
+        await GetTrke();
+        allState.Action += StateHasChanged;
+        Reset();
+    }
+
+    private async Task ToggleExpanded(int trkaId)
+    {
+        if (expandedTrke.Contains(trkaId))
+        {
+            expandedTrke.Remove(trkaId);
+            await js.InvokeVoidAsync("toggleRowAnimation", trkaId, false);
+        }
+        else
+        {
+            var updatedTrka = await trkaService.GetById(trkaId, Constants.TrkaBaseUrl);
+            if (updatedTrka != null)
+            {
+                index = Trke.FindIndex(t => t.Id == trkaId);
+                if (index >= 0)
+                {
+                    Trke[index] = updatedTrka;
+                    expandedTrke.Add(trkaId);
+                    await js.InvokeVoidAsync("toggleRowAnimation", trkaId, true);
+                    brojUcinaka = (updatedTrka.Ucinak != null) ? updatedTrka.Ucinak.Count() : 0;
+                    Console.WriteLine("brucin: " + brojUcinaka);
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Trka with ID {trkaId} not found.");
+            }
+        }
+        StateHasChanged();
+    }
+
+
+    private async Task GetTrke()
+    {
+        Trke = await trkaService.GetAll(Constants.TrkaBaseUrl);
+        SortBy(sortColumn);
+    }
+
+    public string VratiVreme(string vremena)
+    {
+        int vreme = 0;
+        int min, sek;
+        string[] krugovi = vremena.Split(';');
+        foreach (string str in krugovi)
+        {
+            string[] minIsek = str.Split(':');
+            if (minIsek.Count() > 1)
+            {
+                if (int.TryParse(minIsek[0], out min) & int.TryParse(minIsek[1], out sek))
+                    vreme += min * 60 + sek;
+            }
+            else
+                return "null";
+        }
+        return TimeSpan.FromSeconds(vreme).ToString(@"mm\:ss");
+    }
+
+    void OpenDialog()
+    {
+        trkeDialog?.OpenDialog();
+    }
+
+    void Reset()
+    {
+        Trka = new();
+        Trka.BrojKrugova = 1;
+        Trka.DatumTrke = DateTime.Now;
+        trkeDialog?.ChangeTitle("Dodaj");
+    }
+
+    void ResetUcinak()
+    {
+        Trka = new();
+        Trka.BrojKrugova = 1;
+        Trka.DatumTrke = DateTime.Now;
+        trkeDialog?.ChangeTitle("Dodaj");
+    }
+
+    private void AddClicked()
+    {
+        Reset();
+        Trka.Kategorija = new KategorijaDTO
+            {
+                Id = 1
+            };
+        OpenDialog();
+    }
+
+    private void AddUcinakClicked(TrkaDTO selectedTrka)
+    {
+        ResetUcinak();
+        ucinakDialog?.OpenDialog();
+        index = Trke.FindIndex(t => t.Id == selectedTrka.Id);
+        if (Trke[index].Ucinak != null)
+        {
+            Console.WriteLine("broj: " + Trke[index].Ucinak.Count);
+        }
+        else
+        {
+            Console.WriteLine("Ucinak is null");
+        }
+        Trka = Trke[index];
+    }
+
+    private async Task HandleSaveOperationEvent(TrkaDTO trka)
+    {
+        bool successCheck = false;
+        if (trka.Id > 0)
+        {
+            var result = await trkaService.Update(trka, Constants.TrkaBaseUrl);
+            successCheck = await DisplayMessage(result.Flag, result.Message);
+        }
+        else
+        {
+            string jsonPayload = JsonSerializer.Serialize(trka);
+            Console.WriteLine(jsonPayload);
+            var response = await trkaService.Insert(trka, Constants.TrkaBaseUrl);
+            successCheck = await DisplayMessage(response.Flag, response.Message);
+        }
+
+        if (successCheck)
+        {
+            Trka.BrojKrugova = 1;
+            Trka.DatumTrke = DateTime.Now;
+            await GetTrke();
+        }
+    }
+
+    private async Task HandleSaveOperationEvent2((UcinakDTO ucinak, bool display) args)
+    {
+        var (ucinak, display) = args;
+        bool successCheck = false;
+        if (ucinak.Id > 0)
+        {
+            Console.WriteLine("vremena " + ucinak.Vremena + " " + Trke[index].Id);
+            var result = await ucinakService.Update(ucinak, Constants.UcinakBaseUrl);
+            if (display)
+                successCheck = await DisplayMessage(result.Flag, result.Message);
+            else
+                successCheck = !result.Flag;
+        }
+        else
+        {
+            var response = await ucinakService.Insert(ucinak, Constants.UcinakBaseUrl);
+            successCheck = await DisplayMessage(response.Flag, response.Message);
+        }
+
+        if (successCheck)
+        {
+            Console.WriteLine("TRKAAAA " + Trke[index].Id);
+            ucinak.TrkaID = Trke[index].Id;
+            Trke[index].Ucinak = (await trkaService.GetById(ucinak.TrkaID, Constants.TrkaBaseUrl)).Ucinak;
+            Trka = Trke[index];
+        }
+    }
+
+
+    private async Task<bool> DisplayMessage(bool flag, string message)
+    {
+        if (!flag)
+        {
+            await dialogService.AlertAsync(message, "Uspešna operacija!");
+            return true;
+        }
+        else
+        {
+            await dialogService.AlertAsync(message, "Greška!");
+            return false;
+        }
+    }
+
+    private void EditClicked(TrkaDTO trka)
+    {
+        trkeDialog?.ChangeTitle("Izmeni");
+        Trka = trka;
+        OpenDialog();
+    }
+
+    private async Task DeleteClicked(TrkaDTO trka)
+    {
+        bool confirm = await dialogService.ConfirmAsync($"Da li ste sigurni da želite da obrišete trku {trka.Naziv}?", "Potvrdi brisanje");
+        if (!confirm) return;
+
+        var response = await trkaService.DeleteById(trka.Id, Constants.TrkaBaseUrl);
+        if (await DisplayMessage(response.Flag, response.Message))
+            await GetTrke();
+    }
+
+    private void SortBy(string column)
+    {
+        if (sortColumn == column)
+            ascending = !ascending;
+        else
+            ascending = true;
+        sortColumn = column;
+
+        switch (column)
+        {
+            case "Naziv":
+                Trke = ascending ? Trke.OrderBy(v => v.Naziv).ToList() : Trke.OrderByDescending(v => v.Naziv).ToList();
+                break;
+            case "BrojKrugova":
+                Trke = ascending ? Trke.OrderBy(v => v.BrojKrugova).ToList() : Trke.OrderByDescending(v => v.BrojKrugova).ToList();
+                break;
+            case "DatumTrke":
+                Trke = ascending ? Trke.OrderBy(v => v.DatumTrke).ToList() : Trke.OrderByDescending(v => v.DatumTrke).ToList();
+                break;
+            case "NazivKategorije":
+                Trke = ascending ? Trke.OrderBy(v => v.Kategorija.NazivKategorije).ToList() : Trke.OrderByDescending(v => v.Kategorija.NazivKategorije).ToList();
+                break;
+            default:
+                break;
+        }
+
+        StateHasChanged();
+    }
+
+    private void SortByUcinak(TrkaDTO trka, string column)
+    {
+        if (ucinakSortColumn == column)
+            ucinakAscending = !ucinakAscending;
+        else
+            ucinakAscending = true;
+
+        ucinakSortColumn = column;
+
+        Console.WriteLine(Trka.Ucinak is null);
+        Console.WriteLine(trka.Ucinak is null);
+
+        switch (column)
+        {
+            case "ImeIPrezime":
+                trka.Ucinak = ucinakAscending
+                    ? trka.Ucinak.OrderBy(u => u.ImeIPrezime).ToList()
+                    : trka.Ucinak.OrderByDescending(u => u.ImeIPrezime).ToList();
+                break;
+            case "StartnaPozicija":
+                trka.Ucinak = ucinakAscending
+                    ? trka.Ucinak.OrderBy(u => u.StartnaPozicija).ToList()
+                    : trka.Ucinak.OrderByDescending(u => u.StartnaPozicija).ToList();
+                break;
+            case "Plasman":
+                trka.Ucinak = ucinakAscending
+                    ? trka.Ucinak.OrderBy(u => u.Plasman).ToList()
+                    : trka.Ucinak.OrderByDescending(u => u.Plasman).ToList();
+                break;
+            case "Vremena":
+                trka.Ucinak = ucinakAscending
+                    ? trka.Ucinak.OrderBy(u => u.Vremena).ToList()
+                    : trka.Ucinak.OrderByDescending(u => u.Vremena).ToList();
+                break;
+            default:
+                Trka.Ucinak = Trka.Ucinak;
+                break;
+        }
+
+        StateHasChanged();
+    }
+
+    // Edit and delete operations for Ucinci
+    private void EditUcinakClicked(UcinakDTO ucinak)
+    {
+        ucinakDialog?.ChangeTitle("Izmeni");
+        Ucinak = ucinak;
+        ucinakDialog?.OpenDialog();
+    }
+
+    private async Task DeleteUcinakClicked(UcinakDTO ucinak)
+    {
+        bool confirm = await dialogService.ConfirmAsync($"Da li ste sigurni da želite da obrišete učinak vozača {ucinak.ImeIPrezime}?", "Potvrdi brisanje");
+        if (!confirm) return;
+
+        var response = await ucinakService.DeleteById(ucinak.Id, Constants.UcinakBaseUrl);
+        if (await DisplayMessage(response.Flag, response.Message))
+        {
+            Trke[index].Ucinak.Remove(ucinak);  // = (await trkaService.GetById(ucinak.TrkaID, Constants.TrkaBaseUrl)).Ucinak;
+        }
+
+        if (Trka.Ucinak != null)
+        {
+            if (Trka.Ucinak.Count > 0)
+            {
+                Trka.Ucinak = Trka.Ucinak.OrderBy(x => ((UcinakDTO)x).Plasman).ToList();
+                List<UcinakDTO> lista = new();
+                for (int i = 0; i < Trka.Ucinak.Count; i++)
+                {
+                    UcinakDTO u = (UcinakDTO)Trka.Ucinak.ElementAt(i);
+                        if (u.Plasman != i + 1)
+                        {
+                            u.Plasman = i + 1;
+                            u.TrkaID = Trka.Id;
+                            lista.Add(u);
+                        }
+                }
+                foreach (UcinakDTO uc in lista)
+                    await HandleSaveOperationEvent2((uc, false));
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        allState.Action -= StateHasChanged;
+    }
+}

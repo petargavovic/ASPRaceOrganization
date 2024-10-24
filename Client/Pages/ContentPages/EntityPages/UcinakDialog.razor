@@ -1,0 +1,352 @@
+﻿@using System.Globalization
+@using BaseLibrary.DTOs.EntityDTOs
+@using CountryData.Standard
+@using BaseLibrary.Entities
+@using System.Text.Json
+
+<SfDialog Width="350px" IsModal="true" ShowCloseIcon="true" @bind-Visible="IsVisible">
+
+    <DialogEvents OnOpen="OpenDialog"> </DialogEvents>
+    <DialogTemplates>
+        <Header> @Title Ucinak </Header>
+        <Content>
+            <EditForm EditContext="editContext" Enhance OnSubmit="Save">
+                <DataAnnotationsValidator />
+                <div class="card border-success">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">Vozac</label>
+                            <select class="form-control" @bind="Ucinak.VozacID" disabled="@(Title != "Dodaj")">
+                                @foreach (var vozac in Vozaci)
+                                {
+                                    <option value="@vozac.Id">@vozac.Ime @vozac.Prezime</option>
+                                }
+                            </select>
+
+                            <div class="input-group">
+                                <div class="input-group-item">
+                                    <label class="form-label">Startna pozicija</label>
+                                    <select class="form-control" @bind="selektovanaPozicija">
+                                        @foreach (var sp in osam)
+                                        {
+                                            <option value="@sp">@sp</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="input-group-item">
+                                    <label class="form-label">Plasman</label>
+                                    <input type="text" class="form-control" value="@Ucinak.Plasman" disabled />
+                                </div>
+                            </div>
+                            <label class="form-label">Vremena po krugu</label>
+                            @for (int i = 0; i < Trka.BrojKrugova; i++)
+                            {
+                                var minutesId = $"minutes-{i}";
+                                var secondsId = $"seconds-{i}";
+                                <div class="mb-3">
+                                    <h6>Krug @(i + 1)</h6>
+                                    <div class="input-group">
+                                        <div class="input-group-item">
+                                            <label for="@minutesId" class="form-label">Minuti</label>
+                                            <input type="number" id="@minutesId" class="form-control"
+                                                   value="Minutes[i-1]"
+                                                   min="0"
+                                                   max="59"
+                                                   @onchange="@(e => OnMinutesChange(e, minutesId))" />
+                                        </div>
+                                        <div class="input-group-item">
+                                            <label for="@secondsId" class="form-label">Sekunde</label>
+                                            <input type="number" id="@secondsId" class="form-control"
+                                                   value="Seconds[i-1]"
+                                                   min="0"
+                                                   max="59"
+                                                   @onchange="@(e => OnSecondsChange(e, secondsId))" />
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </EditForm>
+        </Content>
+    </DialogTemplates>
+
+    <DialogButtons>
+        <DialogButton Content="SAVE" Type="ButtonType.Submit" IsPrimary="true" @onclick="Save" />
+    </DialogButtons>
+
+</SfDialog>
+
+<style>
+    .input-group {
+        display: flex; /* Use flexbox for layout */
+        gap: 10px; /* Add some space between items */
+        align-items: center; /* Align items vertically */
+    }
+
+    .input-group-item {
+        flex: 1; /* Allow items to grow and fill available space */
+        min-width: 0; /* Prevent shrinking below the content size */
+    }
+
+    .form-label {
+        margin-bottom: 0.5rem; /* Adjust label margin if needed */
+    }
+</style>
+
+@code {
+    [Parameter] public TrkaDTO Trka { get; set; }
+    [Parameter] public UcinakDTO Ucinak { get; set; } = new();
+    [Parameter] public EventCallback<(UcinakDTO, bool)> HandleSaveOperationEvent { get; set; }
+    private bool IsVisible { get; set; } = false;
+    public string Title { get; set; } = "Dodaj";
+    private EditContext editContext;
+    private bool isFormValid = false;
+    public List<VozacDTO> Vozaci { get; set; } = new();
+    List<int> osam = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8 };
+    List<int> startnePozicije = new List<int>();
+    public int selektovanaPozicija;
+
+    // List to store lap times
+    public int[] Minutes;
+    public int[] Seconds;
+
+    // Custom class to hold minutes and seconds for each lap
+    public class LapTime
+    {
+        public int Minutes { get; set; }
+        public int Seconds { get; set; }
+    }
+
+    protected async override void OnInitialized()
+    {
+        editContext = new EditContext(Ucinak);
+    }
+
+    public async void OpenDialog()
+    {
+
+        Vozaci = await vozacService.GetAll(Constants.VozacBaseUrl);
+
+        Minutes = new int[Trka.BrojKrugova];
+        Seconds = new int[Trka.BrojKrugova];
+        if (Title == "Dodaj")
+        {
+            if (Trka.Ucinak != null)
+            {
+                var usedVozacIds = Trka.Ucinak.Select(ucinak => ucinak.VozacID)
+                               .Distinct()
+                               .ToList();
+                Vozaci = Vozaci.Where(vozac => !usedVozacIds.Contains(vozac.Id)).ToList();
+            }
+            Ucinak.VozacID = Vozaci.First().Id;
+            Console.WriteLine($"Krugovi: {Trka.BrojKrugova}");
+            Ucinak.TrkaID = Trka.Id;
+
+        }
+        else
+        {
+            int min, sek;
+            Console.WriteLine("vremena: " + Ucinak.Vremena);
+            string[] vremena = Ucinak.Vremena.Split(';');
+            for (int i = 0; i < vremena.Count(); i++)
+            {
+                string[] minIsek = vremena[i].Split(':');
+                if (int.TryParse(minIsek[0], out min) & int.TryParse(minIsek[1], out sek))
+                {
+                    Console.WriteLine("minuti: " + min);
+                    Minutes[i] = min;
+                    Seconds[i] = sek;
+                }
+            }
+        }
+        IsVisible = true;
+        StateHasChanged();
+
+        //        Ucinak.Vozac = new();
+
+    }
+
+    async void Save()
+    {
+
+        string vremena = "";
+        for (int i = 0; i < Trka.BrojKrugova; i++)
+            vremena += Minutes[i] + ":" + Seconds[i] + ";";
+        vremena = vremena.TrimEnd(';');
+        Ucinak.Vremena = vremena;
+        Ucinak.StartnaPozicija = selektovanaPozicija;
+        Ucinak.TrkaID = Trka.Id;
+        //            Ucinak.Vozac = null;
+        //            Ucinak.Trka = null;
+        Console.WriteLine($"Trka: {Ucinak.TrkaID}");
+        Console.WriteLine($"Vozac: {Ucinak.VozacID}");
+        Console.WriteLine($"Plasman: {Ucinak.Plasman}");
+        Console.WriteLine($"Startna: {Ucinak.StartnaPozicija}");
+        Console.WriteLine($"Vremena: {Ucinak.Vremena}");
+
+        string jsonPayload = JsonSerializer.Serialize(Ucinak);
+        Console.WriteLine(jsonPayload);
+        string[] krugovi = vremena.Split(';');
+        if (!krugovi.Any(krug => krug.Trim() == "0:0"))
+            await HandleSaveOperationEvent.InvokeAsync((Ucinak, true));
+        else
+        {
+            await dialogService.AlertAsync("Vreme kruga ne sme biti 0!", "Greška!");
+            return;
+        }
+
+        int vid = Ucinak.VozacID;
+        //        Vozaci.RemoveAll(vozac => vozac.Id == vid);
+        IEnumerable<int> startnePozicijeS = osam.Except(startnePozicije);
+        int prvaSlobodna = 0;
+        if (!startnePozicijeS.Contains(selektovanaPozicija))
+        {
+            foreach (int j in startnePozicijeS)
+            {
+                if (j > selektovanaPozicija)
+                {
+                    prvaSlobodna = j;
+                    break;
+                }
+            }
+            if (prvaSlobodna == 0)
+            {
+                startnePozicijeS.Reverse();
+                foreach (int j in startnePozicijeS)
+                {
+                    if (j < selektovanaPozicija)
+                    {
+                        prvaSlobodna = j;
+                        break;
+                    }
+                }
+            }
+            if (Trka.Ucinak != null)
+            {
+                Console.WriteLine("broj: " + Trka.Ucinak.Count);
+            }
+            else
+            {
+                Console.WriteLine("Ucinak is null");
+            }
+
+            if (Trka.Ucinak.Count > 0)
+            {
+                UcinakDTO ucinak = (UcinakDTO)Trka.Ucinak.Where(u => ((UcinakDTO)u).StartnaPozicija == selektovanaPozicija).ToList().First();
+                ucinak.TrkaID = Trka.Id;
+                ucinak.StartnaPozicija = prvaSlobodna;
+                ucinak.TrkaID = Trka.Id;
+                await HandleSaveOperationEvent.InvokeAsync((ucinak, false));
+                startnePozicije.InsertElementAscending(prvaSlobodna);
+            }
+        }
+        else
+            startnePozicije.InsertElementAscending(selektovanaPozicija);
+        if (Trka.Ucinak != null)
+        {
+            if (Trka.Ucinak.Count > 0)
+            {
+                Trka.Ucinak = Trka.Ucinak.OrderBy(x => VratiVremeUSekundama(((UcinakDTO)x).Vremena)).ToList();
+                List<UcinakDTO> lista = new();
+                for (int i = 0; i < Trka.Ucinak.Count; i++)
+                {
+                    //                Console.WriteLine(VratiVremeUSekundama(((UcinakDTO)Trka.Ucinak.ElementAt(i)).Vremena));
+                    UcinakDTO ucinak = (UcinakDTO)Trka.Ucinak.ElementAt(i);
+                    if (ucinak.VozacID != vid)
+                    {
+                        if (ucinak.Plasman != i + 1)
+                        {
+                            ucinak.Plasman = i + 1;
+                            ucinak.TrkaID = Trka.Id;
+                            lista.Add(ucinak);
+                        }
+                    }
+                }
+                foreach (UcinakDTO ucinak in lista)
+                    await HandleSaveOperationEvent.InvokeAsync((ucinak, false));
+            }
+            if (Title == "Dodaj")
+            {
+                var usedVozacIds = Trka.Ucinak.Select(ucinak => ucinak.VozacID)
+                                   .Distinct()
+                                   .ToList();
+                Vozaci = Vozaci.Where(vozac => !usedVozacIds.Contains(vozac.Id)).ToList();
+                if (Vozaci.Count > 0)
+                    Ucinak.VozacID = Vozaci.First().Id;
+                StateHasChanged();
+            }
+            else
+            {
+                IsVisible = false;
+                StateHasChanged();
+            }
+        }
+    }
+
+
+    private void ChangetxtPlasman()
+    {
+        if (Trka.Ucinak != null)
+        {
+            if (Title != "Dodaj")
+                Trka.Ucinak.Remove(Ucinak);
+            List<int> listVreme = Trka.Ucinak.Select(i => VratiVremeUSekundama(((UcinakDTO)i).Vremena)).ToList();
+            IOrderedEnumerable<int> listVremeOrdered = listVreme.OrderBy(i => i);
+            listVreme = listVremeOrdered.ToList();
+            int plasman = listVreme.IndexOf(listVreme.InsertElementAscending(VratiVremeIzTabele())) + 1;
+            Ucinak.Plasman = plasman;
+            if (Title != "Dodaj")
+                Trka.Ucinak.Add(Ucinak);
+        }
+        else
+            Ucinak.Plasman = 1;
+    }
+
+    int VratiVremeIzTabele()
+    {
+        int zbir = 0;
+        for (int i = 0; i < Trka.BrojKrugova; i++)
+            zbir += Minutes[i] * 60 + Seconds[i];
+        return zbir;
+    }
+    public int VratiVremeUSekundama(string vremena)
+    {
+        int vreme = 0;
+        int min, sek;
+        string[] krugovi = vremena.Split(';');
+        foreach (string str in krugovi)
+        {
+            string[] minIsek = str.Split(':');
+            if (int.TryParse(minIsek[0], out min) & int.TryParse(minIsek[1], out sek))
+                vreme += min * 60 + sek;
+        }
+        return vreme;
+    }
+
+    private void OnMinutesChange(ChangeEventArgs e, string inputId)
+    {
+        int index = int.Parse(inputId.Substring(inputId.Length - 1, 1));
+        if (int.TryParse(e.Value.ToString(), out int newValue))
+        {
+            Minutes[index] = Math.Clamp(newValue, 0, 59);
+        }
+        ChangetxtPlasman();
+    }
+
+    private void OnSecondsChange(ChangeEventArgs e, string inputId)
+    {
+        int index = int.Parse(inputId.Substring(inputId.Length - 1, 1));
+        if (int.TryParse(e.Value.ToString(), out int newValue))
+        {
+            Seconds[index] = Math.Clamp(newValue, 0, 59);
+        }
+        ChangetxtPlasman();
+    }
+
+    public void ChangeTitle(string title)
+    {
+        Title = title;
+    }
+}
